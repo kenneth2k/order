@@ -234,7 +234,9 @@ export function CreateOrder() {
 										<Box>
 											{Number(String(order.customerPays).replace(/[^0-9]/g, '')) - totalSumPriceProduct < 0
 												? 0
-												: (Number(String(order.customerPays).replace(/[^0-9]/g, '')) - totalSumPriceProduct).toFixed(0)}
+												: formatVND(
+														(Number(String(order.customerPays).replace(/[^0-9]/g, '')) - totalSumPriceProduct).toFixed(0)
+												  )}
 											đ
 										</Box>
 									</Stack>
