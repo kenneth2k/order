@@ -11,13 +11,13 @@ import { DiscountAPI } from '../../api-client/discount.api';
 export function CreateOrder() {
 	const refProduct = useRef<any>(null);
 	const [order, setOrder] = useState<ICart>({
-		full_name: '',
+		fullName: '',
 		email: '',
 		phone: '',
 		items: [],
 		isUpdatedItems: new Date().getTime(),
 		paymentType: 'amount',
-		customerPays: 0,
+		refundPays: 0,
 	});
 
 	const [isModal, setIsModal] = useState(false);
@@ -60,22 +60,23 @@ export function CreateOrder() {
 		}
 		setOrder(orderNew);
 	};
-	const handleInputDiscountCode = (discount_code: string, id: string) => {
-		if (!discount_code.replace(/ +/g, '').length) return;
+	const handleInputDiscountCode = (discountType: string, id: string) => {
+		if (!discountType.replace(/ +/g, '').length) return;
 
 		DiscountAPI.get({
-			search: discount_code,
+			search: discountType,
 		})
 			.then((data) => {
 				if (data?.length) {
-					let discount = data[0];
+					let discount = data.find((d: any) => d.code === discountType);
+					if (!discount) return;
 
 					let orderNew = _.cloneDeep(order);
 					let idx = orderNew.items.findIndex((p) => p.id === id);
 					if (idx > -1) {
-						orderNew.items[idx].discount_code = discount.code;
-						orderNew.items[idx].discount_type = discount.type;
-						orderNew.items[idx].discount_value = discount.value;
+						orderNew.items[idx].discountCode = discount.code;
+						orderNew.items[idx].discountType = discount.type;
+						orderNew.items[idx].discountValue = discount.value;
 
 						if (discount.type === 'percent') {
 							let percent = Number(discount.value) / 100;
@@ -106,12 +107,12 @@ export function CreateOrder() {
 							<Grid2 container spacing={2} p="14px">
 								<Grid2 size={6}>
 									<TextField
-										value={order.full_name}
+										value={order.fullName}
 										placeholder="Nhập tên khách hàng"
 										onChange={(event) => {
 											let value = event.target.value.replace(/ +/g, ' ');
 											let orderNew = _.cloneDeep(order);
-											orderNew.full_name = value;
+											orderNew.fullName = value;
 											setOrder(orderNew);
 										}}
 										size="small"
@@ -215,13 +216,13 @@ export function CreateOrder() {
 										<Box>Khách trả</Box>
 										<Box>
 											<TextField
-												value={order.customerPays === 0 ? '' : formatVND(order.customerPays)}
+												value={order.refundPays === 0 ? '' : formatVND(order.refundPays)}
 												placeholder="Nhập số tiền"
 												onChange={(event) => {
 													let value = event.target.value.replace(/ +/g, ' ');
 													value = value.replace(/[^0-9]/g, '');
 													let orderNew = _.cloneDeep(order);
-													orderNew.customerPays = event.target.value as any;
+													orderNew.refundPays = event.target.value as any;
 													setOrder(orderNew);
 												}}
 												size="small"
@@ -229,17 +230,22 @@ export function CreateOrder() {
 											/>
 										</Box>
 									</Stack>
-									<Stack direction="row" justifyContent="space-between" flexWrap="wrap">
-										<Box>tiền thừa trả khách</Box>
-										<Box>
-											{Number(String(order.customerPays).replace(/[^0-9]/g, '')) - totalSumPriceProduct < 0
-												? 0
-												: formatVND(
-														(Number(String(order.customerPays).replace(/[^0-9]/g, '')) - totalSumPriceProduct).toFixed(0)
-												  )}
-											đ
-										</Box>
-									</Stack>
+
+									{Number(String(order.refundPays).replace(/[^0-9]/g, '')) - totalSumPriceProduct > 0 && (
+										<Stack direction="row" justifyContent="space-between" flexWrap="wrap">
+											<Box>Tiền thừa trả khách</Box>
+											<Box>
+												{Number(String(order.refundPays).replace(/[^0-9]/g, '')) - totalSumPriceProduct < 0
+													? 0
+													: formatVND(
+															(Number(String(order.refundPays).replace(/[^0-9]/g, '')) - totalSumPriceProduct).toFixed(
+																0
+															)
+													  )}
+												đ
+											</Box>
+										</Stack>
+									)}
 								</>
 							)}
 						</Stack>

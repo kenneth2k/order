@@ -12,11 +12,11 @@ function ItemProduct(props: {
 	onChecked?: (checked: boolean, id: string) => void;
 	onChangeQuantity: (quantity: number, id: string) => void;
 	onChangePrice: (price: number, id: string) => void;
-	onInputDiscountCode: (discount_code: string, id: string) => void;
+	onInputDiscountCode: (discountCode: string, id: string) => void;
 }) {
 	const { onInputDiscountCode, data, onChangeQuantity, onChangePrice } = props;
 
-	const [inputDiscountCode, setInputDiscountCode] = useState<string>(data.discount_code || '');
+	const [inputDiscountCode, setInputDiscountCode] = useState<string>(data.discountCode || '');
 	const debounceInputDiscountCode = useDebounce<string>(inputDiscountCode);
 
 	const handleRemove = () => {
@@ -97,7 +97,7 @@ function ItemProduct(props: {
 				<Stack direction="row" alignItems="center" height="100%">
 					<TextField
 						type={'text'}
-						value={data.discount_code}
+						value={data.discountCode}
 						onChange={(event) => {
 							let value = event.target.value.replace(/ +/g, '');
 							setInputDiscountCode(value);
@@ -124,7 +124,7 @@ function ItemProduct(props: {
 
 export function ListProductSelected(props: {
 	onChangeQuantity: (quantity: number, id: string) => void;
-	onInputDiscountCode: (discount_code: string, id: string) => void;
+	onInputDiscountCode: (discountCode: string, id: string) => void;
 	onChangePrice: (price: number, id: string) => void;
 	products: ICartProductItem[];
 	onRemoveProductSelected: (id: string) => void;

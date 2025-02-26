@@ -52,7 +52,7 @@ function ItemProduct(props: { data: ICartProductItem }) {
 			</Grid2>
 			<Grid2 size={2}>
 				<Stack direction="row" alignItems="center" height="100%">
-					{data.discount_code}
+					{data.discountCode}
 				</Stack>
 			</Grid2>
 		</>
@@ -97,7 +97,7 @@ export function ConfirmOrder(props: { order: ICart; isModal: boolean; setModal: 
 								<Divider />
 								<Grid2 container spacing={1.5} p="14px">
 									<Grid2 size={3}>Họ tên: </Grid2>
-									<Grid2 size={9}>{order.full_name}</Grid2>
+									<Grid2 size={9}>{order.fullName}</Grid2>
 									<Grid2 size={3}>Email:</Grid2>
 									<Grid2 size={9}>{order.email}</Grid2>
 									<Grid2 size={3}>Số điện thoại:</Grid2>
@@ -148,14 +148,14 @@ export function ConfirmOrder(props: { order: ICart; isModal: boolean; setModal: 
 									<>
 										<Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap">
 											<Box>Khách trả</Box>
-											<Box>{formatVND(order.customerPays)}đ</Box>
+											<Box>{formatVND(order.refundPays)}đ</Box>
 										</Stack>
 										<Stack direction="row" justifyContent="space-between" flexWrap="wrap">
 											<Box>tiền thừa trả khách</Box>
 											<Box>
-												{Number(String(order.customerPays).replace(/[^0-9]/g, '')) - totalSumPriceProduct < 0
+												{Number(String(order.refundPays).replace(/[^0-9]/g, '')) - totalSumPriceProduct < 0
 													? 0
-													: formatVND(Number(String(order.customerPays).replace(/[^0-9]/g, '')) - totalSumPriceProduct)}
+													: formatVND(Number(String(order.refundPays).replace(/[^0-9]/g, '')) - totalSumPriceProduct)}
 												đ
 											</Box>
 										</Stack>
