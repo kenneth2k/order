@@ -12,6 +12,7 @@ export interface ICartProductItem extends IProduct {
 	discountCode?: string;
 	discountValue?: number;
 	quantity: number;
+	originalPrice: number;
 }
 
 export interface ICart {

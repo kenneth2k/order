@@ -41,7 +41,6 @@ function ItemProduct(props: { data: IProduct; checked?: boolean; onChecked?: (ch
 			<Box>
 				<Checkbox checked={checked} size="small" />
 			</Box>
-			,
 			<Stack direction="row" gap="10px" alignItems="center">
 				{data?.image ? (
 					<Box component="img" src={data?.image} alt={data?.title || ''} width={50} height={50} />

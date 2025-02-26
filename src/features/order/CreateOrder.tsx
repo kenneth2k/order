@@ -55,42 +55,64 @@ export function CreateOrder() {
 		let orderNew = _.cloneDeep(order);
 		let idx = orderNew.items.findIndex((p) => p.id === id);
 		if (idx > -1) {
+			orderNew.items[idx].originalPrice = Number(orderNew.items[idx].price);
 			orderNew.items[idx].price = Number(price);
 			orderNew.isUpdatedItems = new Date().getTime();
 		}
 		setOrder(orderNew);
 	};
 	const handleInputDiscountCode = (discountType: string, id: string) => {
-		if (!discountType.replace(/ +/g, '').length) return;
+		if (!discountType) {
+			let orderNew = _.cloneDeep(order);
+			let idx = orderNew.items.findIndex((p) => p.id === id);
+			orderNew.items[idx].discountType = 'amount';
+			orderNew.items[idx].discountCode = '';
+			orderNew.items[idx].discountValue = 0;
+			if (Number(orderNew.items[idx].originalPrice)) {
+				orderNew.items[idx].price = Number(orderNew.items[idx].originalPrice);
+			}
+			setOrder(orderNew);
+			return;
+		}
 
 		DiscountAPI.get({
 			search: discountType,
 		})
 			.then((data) => {
-				if (data?.length) {
-					let discount = data.find((d: any) => d.code === discountType);
-					if (!discount) return;
-
-					let orderNew = _.cloneDeep(order);
-					let idx = orderNew.items.findIndex((p) => p.id === id);
-					if (idx > -1) {
-						orderNew.items[idx].discountCode = discount.code;
-						orderNew.items[idx].discountType = discount.type;
-						orderNew.items[idx].discountValue = discount.value;
-
-						if (discount.type === 'percent') {
-							let percent = Number(discount.value) / 100;
-							orderNew.items[idx].price = Number(orderNew.items[idx].price) - Number(orderNew.items[idx].price) * percent;
-						} else if (discount.type === 'fixed_amount') {
-							orderNew.items[idx].price = Number(orderNew.items[idx].price) - Number(discount.value);
-						}
-
-						orderNew.isUpdatedItems = new Date().getTime();
-					}
-					setOrder(orderNew);
+				let orderNew = _.cloneDeep(order);
+				let idx = orderNew.items.findIndex((p) => p.id === id);
+				let discount = data.find((d: any) => d.code === discountType);
+				if (!discount) {
+					return;
 				}
+				if (idx > -1) {
+					orderNew.items[idx].discountType = discount.type;
+					orderNew.items[idx].discountCode = discount.code;
+					orderNew.items[idx].discountValue = discount.value;
+					orderNew.items[idx].originalPrice = orderNew.items[idx].price;
+
+					if (discount.type === 'percent') {
+						let percent = Number(discount.value) / 100;
+						orderNew.items[idx].price = Number(orderNew.items[idx].price) - Number(orderNew.items[idx].price) * percent;
+					} else if (discount.type === 'fixed_amount') {
+						orderNew.items[idx].price = Number(orderNew.items[idx].price) - Number(discount.value);
+					}
+
+					orderNew.isUpdatedItems = new Date().getTime();
+				}
+				setOrder(orderNew);
 			})
-			.catch((err) => {});
+			.catch((err) => {
+				let orderNew = _.cloneDeep(order);
+				let idx = orderNew.items.findIndex((p) => p.id === id);
+				orderNew.items[idx].discountType = 'amount';
+				orderNew.items[idx].discountCode = '';
+				orderNew.items[idx].discountValue = 0;
+				if (Number(orderNew.items[idx].originalPrice)) {
+					orderNew.items[idx].price = Number(orderNew.items[idx].originalPrice);
+				}
+				setOrder(orderNew);
+			});
 	};
 
 	return (
